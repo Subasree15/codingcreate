@@ -1,0 +1,152 @@
+import java.util.*;
+
+class Train {
+    int trainNo;
+    String trainName;
+    String source;
+    String destination;
+    int seatsAvailable;
+
+    Train(int trainNo, String trainName, String source, String destination, int seatsAvailable) {
+        this.trainNo = trainNo;
+        this.trainName = trainName;
+        this.source = source;
+        this.destination = destination;
+        this.seatsAvailable = seatsAvailable;
+    }
+
+    void display() {
+        System.out.printf("Train No: %d | Name: %s | From: %s | To: %s | Seats: %d\n",
+                trainNo, trainName, source, destination, seatsAvailable);
+    }
+}
+
+class Booking {
+    String passengerName;
+    int trainNo;
+
+    Booking(String passengerName, int trainNo) {
+        this.passengerName = passengerName;
+        this.trainNo = trainNo;
+    }
+
+    void display() {
+        System.out.println("Passenger: " + passengerName + " | Train No: " + trainNo);
+    }
+}
+
+public class RailwayReservationSystem {
+    static Scanner sc = new Scanner(System.in);
+    static List<Train> trains = new ArrayList<>();
+    static List<Booking> bookings = new ArrayList<>();
+
+    public static void main(String[] args) {
+        initializeTrains();
+
+        int choice;
+        do {
+            System.out.println("\n=== Railway Reservation System ===");
+            System.out.println("1. View Trains");
+            System.out.println("2. Book Ticket");
+            System.out.println("3. Cancel Ticket");
+            System.out.println("4. View Bookings");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();  // clear buffer
+
+            switch (choice) {
+                case 1:
+                    viewTrains();
+                    break;
+                case 2:
+                    bookTicket();
+                    break;
+                case 3:
+                    cancelTicket();
+                    break;
+                case 4:
+                    viewBookings();
+                    break;
+                case 5:
+                    System.out.println("Thank you for using the system.");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        } while (choice != 5);
+    }
+
+    static void initializeTrains() {
+        trains.add(new Train(101, "Express 1", "Delhi", "Mumbai", 3));
+        trains.add(new Train(102, "Express 2", "Bangalore", "Chennai", 2));
+        trains.add(new Train(103, "Express 3", "Kolkata", "Hyderabad", 5));
+    }
+
+    static void viewTrains() {
+        System.out.println("\nAvailable Trains:");
+        for (Train t : trains) {
+            t.display();
+        }
+    }
+
+    static void bookTicket() {
+        System.out.print("Enter passenger name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter train number to book: ");
+        int trainNo = sc.nextInt();
+
+        for (Train t : trains) {
+            if (t.trainNo == trainNo) {
+                if (t.seatsAvailable > 0) {
+                    t.seatsAvailable--;
+                    bookings.add(new Booking(name, trainNo));
+                    System.out.println("Ticket booked successfully!");
+                    return;
+                } else {
+                    System.out.println("No seats available on this train.");
+                    return;
+                }
+            }
+        }
+        System.out.println("Train not found.");
+    }
+
+    static void cancelTicket() {
+        System.out.print("Enter passenger name to cancel: ");
+        String name = sc.nextLine();
+        Iterator<Booking> itr = bookings.iterator();
+        boolean found = false;
+
+        while (itr.hasNext()) {
+            Booking b = itr.next();
+            if (b.passengerName.equalsIgnoreCase(name)) {
+                for (Train t : trains) {
+                    if (t.trainNo == b.trainNo) {
+                        t.seatsAvailable++;
+                        break;
+                    }
+                }
+                itr.remove();
+                found = true;
+                System.out.println("Ticket canceled successfully!");
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("No booking found for this name.");
+        }
+    }
+
+    static void viewBookings() {
+        System.out.println("\nAll Bookings:");
+        if (bookings.isEmpty()) {
+            System.out.println("No bookings yet.");
+        } else {
+            for (Booking b : bookings) {
+                b.display();
+            }
+        }
+    }
+}
